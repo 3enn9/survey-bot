@@ -1,8 +1,9 @@
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 
-from .models import Appeals
+from .models import Appeals, Meets
+
+PAGE_SIZE = 2
 
 
 async def orm_add_post(session: AsyncSession, data: dict):
@@ -25,11 +26,17 @@ async def orm_delete_post(id: int, session: AsyncSession):
     await session.commit()
 
 
-async def orm_get_posts(session: AsyncSession):
-    stmt = select(Appeals)
-    result = await session.execute(stmt)
+async def orm_get_posts(page: int, session: AsyncSession):
+    offset = page * PAGE_SIZE
+    query = select(Appeals).offset(offset).limit(PAGE_SIZE + 1)
+    result = await session.execute(query)
     posts = result.scalars().all()
-    return posts
+
+    has_next_page = len(posts) > PAGE_SIZE
+    if has_next_page:
+        posts = posts[:-1]  # Удаление последнего элемента, если есть следующая страница
+
+    return posts, has_next_page
 
 
 async def orm_get_post(post_id: int, session: AsyncSession):
@@ -38,11 +45,36 @@ async def orm_get_post(post_id: int, session: AsyncSession):
     post = result.scalar_one_or_none()
     return post
 
+async def orm_get_meet(post_id: int, session: AsyncSession):
+    query = select(Meets).where(Meets.id == post_id)
+    result = await session.execute(query)
+    post = result.scalar_one_or_none()
+    return post
 
-# async def orm_delete_post(post_id: int, session: AsyncSession):
-#     query = select(Appeals).where(Appeals.id == post_id)
-#     result = await session.execute(query)
-#     post = result.scalar_one_or_none()
-#     if post:
-#         await session.delete(post)
-#         await session.commit()
+
+async def orm_add_meet(session: AsyncSession, data: dict):
+    obj = Meets(
+        date=data['date'],
+        topic=data['topic'],
+        time=data['time'],
+        place=data['place']
+    )
+    session.add(obj)
+    await session.commit()
+
+
+async def orm_get_meets(page: int, session: AsyncSession):
+    offset = page * PAGE_SIZE
+    query = select(Meets).offset(offset).limit(PAGE_SIZE + 1)
+    result = await session.execute(query)
+    meets = result.scalars().all()
+    has_next_page = len(meets) > PAGE_SIZE
+    if has_next_page:
+        meets = meets[:-1]  # Удаление последнего элемента, если есть следующая страница
+
+    return meets, has_next_page
+
+async def orm_delete_meet(id: int, session: AsyncSession):
+    query = delete(Meets).where(Appeals.id == id)
+    await session.execute(query)
+    await session.commit()

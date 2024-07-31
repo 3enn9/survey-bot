@@ -18,6 +18,8 @@ class Survey(StatesGroup):
     photo = State()
     phone = State()
 
+    product_for_change = None
+
 
 main_keyboard = ReplyKeyboardMarkup(
     resize_keyboard=True,
@@ -43,6 +45,17 @@ async def write_me(message: types.Message):
 async def write_an_appeal(message: types.Message, state: FSMContext):
     await message.answer(text='Напишите район, в котором обнаружена проблема', reply_markup=ReplyKeyboardRemove())
     await state.set_state(Survey.district)
+
+@router.message(StateFilter('*'), Command("отмена"))
+@router.message(StateFilter('*'), F.text.casefold() == "отмена")
+async def cancel_handler(message: types.Message, state: FSMContext) -> None:
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+    if Survey.product_for_change:
+        Survey.product_for_change = None
+    await state.clear()
+    await message.answer("Действия отменены", reply_markup=main_keyboard)
 
 
 @router.message(Survey.district, F.text)
@@ -102,6 +115,11 @@ async def get_phone_number(message: types.Message, state: FSMContext, session: A
     await state.clear()
 
 
+@router.message(F.text == 'Мероприятия и дворовые встречи')
+async def meets(message: types.Message):
+    pass
+
+
 @router.message()
 async def common(message: types.Message):
-    await message.answer(str(message.from_user.id))
+    await message.answer(text=f'{str(message.from_user.id)} {message.photo[-1].file_id}')

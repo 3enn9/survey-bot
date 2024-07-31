@@ -18,3 +18,19 @@ class Appeals(Base):
     description: Mapped[str] = mapped_column(Text, nullable=False)
     photo: Mapped[str] = mapped_column(String(150), nullable=False)
     phone_number: Mapped[str] = mapped_column(String(50), nullable=False)
+
+
+from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy.orm import declarative_base, Mapped, mapped_column
+
+Base = declarative_base()
+
+
+class Meets(Base):
+    __tablename__ = 'meets'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    date: Mapped[str] = mapped_column(String(20), nullable=False)
+    topic: Mapped[str] = mapped_column(Text, nullable=False)
+    time: Mapped[str] = mapped_column(String(50), nullable=False)
+    place: Mapped[str] = mapped_column(String(150), nullable=False)
