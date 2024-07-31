@@ -14,8 +14,8 @@ from database import orm_get_posts, orm_get_post, orm_delete_post, orm_add_meet,
 
 router = Router(name=__name__)
 router.message.filter(IsAdmin())
+router.callback_query.filter(IsAdmin())
 
-PAGE_SIZE = 10
 photo_posts = "AgACAgIAAxkBAAIEKGaqhpQo9sEg--nJX_d-kHA0nFcGAAKm4jEbGH5YSWQYxK_hsNyhAQADAgADeQADNQQ"
 
 
@@ -242,14 +242,14 @@ def create_meets_pagination_keyboard(meets, page, has_next_page):
 
 
 @router.callback_query(MeetPaginationCallback.filter())
-async def paginate_meets_callback_handler(callback_query: types.CallbackQuery, callback_data: PaginationCallback,
+async def paginate_meets_callback_handler(callback_query: types.CallbackQuery, callback_data: MeetPaginationCallback,
                                           session: AsyncSession):
     page = callback_data.page
     meets, has_next_page = await orm_get_meets(page, session)
     keyboard = create_meets_pagination_keyboard(meets, page, has_next_page)
 
     await callback_query.message.edit_reply_markup(reply_markup=keyboard)
-    await callback_query.answer()
+    # await callback_query.answer()
 
 
 @router.callback_query(F.data.startswith('meet_'))
@@ -257,6 +257,7 @@ async def show_meet(callback_query: types.CallbackQuery, session: AsyncSession):
     data = callback_query.data.split('_')
     meet_id = int(data[1])
     page = int(data[2])  # Извлекаем текущую страницу
+    print(data)
 
     meet = await orm_get_meet(meet_id, session)
 
@@ -271,7 +272,6 @@ async def show_meet(callback_query: types.CallbackQuery, session: AsyncSession):
         text=f'Дата: {meet.date}\nТема: {meet.topic}\nВремя: {meet.time}\nМесто: {meet.place}',
         reply_markup=keyboard
     )
-    await callback_query.answer()
 
 
 @router.callback_query(F.data.startswith('delmeet_'))

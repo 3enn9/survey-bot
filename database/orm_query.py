@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import Appeals, Meets
 
-PAGE_SIZE = 2
+PAGE_SIZE = 10
 
 
 async def orm_add_post(session: AsyncSession, data: dict):
