@@ -6,4 +6,4 @@ from .admin import router as admin_router
 
 router = Router(name=__name__)
 
-router.include_routers(admin_router, user_router)
+router.include_routers(user_router, admin_router)
