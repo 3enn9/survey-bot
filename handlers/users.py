@@ -53,12 +53,12 @@ async def write_me(message: types.Message):
 @router.message(StateFilter(None), F.text == 'Написать обращение')
 async def write_an_appeal(message: types.Message, state: FSMContext):
     await message.answer(text='Напишите район, в котором обнаружена проблема, чтобы отменить действия, напишите'
-                              '"Отмена"', reply_markup=ReplyKeyboardRemove())
+                              '"Отменить"', reply_markup=ReplyKeyboardRemove())
     await state.set_state(Survey.district)
 
 
-@router.message(StateFilter('*'), Command("отмена"))
-@router.message(StateFilter('*'), F.text.casefold() == "отмена")
+@router.message(StateFilter('*'), Command("отменить"))
+@router.message(StateFilter('*'), F.text.casefold() == "отменить")
 async def cancel_handler(message: types.Message, state: FSMContext) -> None:
     current_state = await state.get_state()
     if current_state is None:
@@ -87,7 +87,7 @@ async def write_an_appeal(message: types.Message, state: FSMContext):
 @router.message(Survey.description, F.text)
 async def write_an_appeal(message: types.Message, state: FSMContext):
     await state.update_data(description=message.text)
-    await message.answer(text='Прикрепите фото проблемы для вашего обращения, если нет фото напишите "Нет"')
+    await message.answer(text='Прикрепите фото проблемы для вашего обращения, если нет фото, напишите "Нет"')
     await state.set_state(Survey.photo)
 
 

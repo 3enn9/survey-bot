@@ -168,12 +168,12 @@ async def delete_post(callback_query: types.CallbackQuery, session: AsyncSession
 
 @router.message(StateFilter(None), F.text == 'Добавить мероприятие')
 async def write_date(message: types.Message, state: FSMContext):
-    await message.answer(text='Напишите дату в формате ДД.ММ.ГГ, чтобы отменить дейсвтия напишите "Отменить"', reply_markup=ReplyKeyboardRemove())
+    await message.answer(text='Напишите дату в формате ДД.ММ.ГГ, чтобы отменить действия напишите "Отменить"', reply_markup=ReplyKeyboardRemove())
     await state.set_state(Meet.date)
 
 
-@router.message(StateFilter('*'), Command("отмена"))
-@router.message(StateFilter('*'), F.text.casefold() == "отмена")
+@router.message(StateFilter('*'), Command("отменить"))
+@router.message(StateFilter('*'), F.text.casefold() == "отменить")
 async def cancel_handler(message: types.Message, state: FSMContext) -> None:
     current_state = await state.get_state()
     if current_state is None:
@@ -208,7 +208,7 @@ async def write_place(message: types.Message, state: FSMContext):
 @router.message(Meet.place, F.text)
 async def write_done(message: types.Message, state: FSMContext, session: AsyncSession):
     await state.update_data(place=message.text)
-    await message.answer(text='Ваше обращение принято', reply_markup=main_admin_keyboard)
+    await message.answer(text='Мероприятие добавлено', reply_markup=main_admin_keyboard)
     data = await state.get_data()
     await orm_add_meet(session, data)
     await state.clear()
