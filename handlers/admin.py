@@ -168,7 +168,7 @@ async def delete_post(callback_query: types.CallbackQuery, session: AsyncSession
 
 @router.message(StateFilter(None), F.text == 'Добавить мероприятие')
 async def write_date(message: types.Message, state: FSMContext):
-    await message.answer(text='Напишите дату в формате ДД.ММ.ГГ', reply_markup=ReplyKeyboardRemove())
+    await message.answer(text='Напишите дату в формате ДД.ММ.ГГ, чтобы отменить дейсвтия напишите "Отменить"', reply_markup=ReplyKeyboardRemove())
     await state.set_state(Meet.date)
 
 

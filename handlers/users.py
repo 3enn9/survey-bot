@@ -15,6 +15,7 @@ router = Router(name=__name__)
 router.message.filter(IsUser())
 router.callback_query.filter(IsUser())
 
+
 class Survey(StatesGroup):
     district = State()
     address = State()
@@ -51,7 +52,8 @@ async def write_me(message: types.Message):
 
 @router.message(StateFilter(None), F.text == 'Написать обращение')
 async def write_an_appeal(message: types.Message, state: FSMContext):
-    await message.answer(text='Напишите район, в котором обнаружена проблема', reply_markup=ReplyKeyboardRemove())
+    await message.answer(text='Напишите район, в котором обнаружена проблема, чтобы отменить действия, напишите'
+                              '"Отмена"', reply_markup=ReplyKeyboardRemove())
     await state.set_state(Survey.district)
 
 
@@ -85,13 +87,28 @@ async def write_an_appeal(message: types.Message, state: FSMContext):
 @router.message(Survey.description, F.text)
 async def write_an_appeal(message: types.Message, state: FSMContext):
     await state.update_data(description=message.text)
-    await message.answer(text='Прикрепите фото проблемы для вашего обращения')
+    await message.answer(text='Прикрепите фото проблемы для вашего обращения, если нет фото напишите "Нет"')
     await state.set_state(Survey.photo)
 
 
 @router.message(Survey.photo, F.photo)
 async def write_an_appeal(message: types.Message, state: FSMContext):
     await state.update_data(photo=message.photo[-1].file_id)  # Сохраняем ID фото
+    # Создаем клавиатуру с кнопкой для запроса контакта
+    contact_keyboard = ReplyKeyboardMarkup(
+        resize_keyboard=True,
+        keyboard=[
+            [KeyboardButton(text='Отправить контакт', request_contact=True)]
+        ]
+    )
+    await message.answer(text='Напишите ваш номер телефона для связи или отправьте контакт',
+                         reply_markup=contact_keyboard)
+    await state.set_state(Survey.phone)
+
+
+@router.message(Survey.photo, F.text)
+async def get_phone_number(message: types.Message, state: FSMContext, session: AsyncSession):
+    await state.update_data(photo='AgACAgIAAxkBAAIEKGaqhpQo9sEg--nJX_d-kHA0nFcGAAKm4jEbGH5YSWQYxK_hsNyhAQADAgADeQADNQQ')
     # Создаем клавиатуру с кнопкой для запроса контакта
     contact_keyboard = ReplyKeyboardMarkup(
         resize_keyboard=True,
@@ -195,6 +212,6 @@ async def list_meets_callback_handler(callback_query: types.CallbackQuery, sessi
         reply_markup=keyboard
     )
 
-# @router.message()
-# async def common(message: types.Message):
-#     await message.answer(text=f'{str(message.from_user.id)} {message.photo[-1].file_id}')
+@router.message()
+async def common(message: types.Message):
+    await message.answer(text=f'Я вас не понимаю\nВаш ID: {str(message.from_user.id)}')
