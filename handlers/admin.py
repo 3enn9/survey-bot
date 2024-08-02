@@ -172,8 +172,8 @@ async def write_date(message: types.Message, state: FSMContext):
     await state.set_state(Meet.date)
 
 
-@router.message(StateFilter('*'), Command("отмена"))
-@router.message(StateFilter('*'), F.text.casefold() == "отмена")
+@router.message(StateFilter('*'), Command("отмена"), IsAdmin())
+@router.message(StateFilter('*'), F.text.casefold() == "отмена", IsAdmin())
 async def cancel_handler(message: types.Message, state: FSMContext) -> None:
     current_state = await state.get_state()
     if current_state is None:

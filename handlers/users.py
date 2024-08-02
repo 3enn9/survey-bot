@@ -9,6 +9,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import orm_delete_post, orm_add_post, orm_get_meets, orm_get_meet
+from filters import IsAdmin
 
 router = Router(name=__name__)
 
@@ -53,8 +54,8 @@ async def write_an_appeal(message: types.Message, state: FSMContext):
     await state.set_state(Survey.district)
 
 
-@router.message(StateFilter('*'), Command("отмена"))
-@router.message(StateFilter('*'), F.text.casefold() == "отмена")
+@router.message(StateFilter('*'), Command("отмена"), ~IsAdmin())
+@router.message(StateFilter('*'), F.text.casefold() == "отмена", ~IsAdmin())
 async def cancel_handler(message: types.Message, state: FSMContext) -> None:
     current_state = await state.get_state()
     if current_state is None:
