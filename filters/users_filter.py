@@ -1,5 +1,6 @@
 from aiogram import types
 from aiogram.filters import BaseFilter
+from admin_filter import IsAdmin
 
 
 class IsUser(BaseFilter):
