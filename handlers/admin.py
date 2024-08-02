@@ -77,7 +77,7 @@ main_admin_keyboard = ReplyKeyboardMarkup(
 
 
 @router.callback_query(F.data == 'admin')
-@router.message(Command(commands=['admin']))
+@router.message(Command(commands=['start']))
 async def admin_command(message: types.Message):
     await message.answer(text="Админ меню", reply_markup=main_admin_keyboard)
 
@@ -172,8 +172,8 @@ async def write_date(message: types.Message, state: FSMContext):
     await state.set_state(Meet.date)
 
 
-@router.message(StateFilter('*'), Command("отмена"), IsAdmin())
-@router.message(StateFilter('*'), F.text.casefold() == "отмена", IsAdmin())
+@router.message(StateFilter('*'), Command("отмена"))
+@router.message(StateFilter('*'), F.text.casefold() == "отмена")
 async def cancel_handler(message: types.Message, state: FSMContext) -> None:
     current_state = await state.get_state()
     if current_state is None:

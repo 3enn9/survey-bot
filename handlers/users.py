@@ -9,10 +9,11 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import orm_delete_post, orm_add_post, orm_get_meets, orm_get_meet
-from filters import IsAdmin
+from filters import IsUser
 
 router = Router(name=__name__)
-
+router.message.filter(IsUser())
+router.callback_query.filter(IsUser())
 
 class Survey(StatesGroup):
     district = State()
@@ -38,7 +39,7 @@ class MeetPaginationCallback(CallbackData, prefix="meet_page"):
     page: int
 
 
-@router.message(Command(commands=['start']))
+@router.message(Command(commands=['start']), ~IsAdmin)
 async def start_command(message: types.Message):
     await message.answer(text='Привет, выбери нужный пункт', reply_markup=main_keyboard)
 
@@ -54,8 +55,8 @@ async def write_an_appeal(message: types.Message, state: FSMContext):
     await state.set_state(Survey.district)
 
 
-@router.message(StateFilter('*'), Command("отмена"), ~IsAdmin())
-@router.message(StateFilter('*'), F.text.casefold() == "отмена", ~IsAdmin())
+@router.message(StateFilter('*'), Command("отмена"))
+@router.message(StateFilter('*'), F.text.casefold() == "отмена")
 async def cancel_handler(message: types.Message, state: FSMContext) -> None:
     current_state = await state.get_state()
     if current_state is None:
