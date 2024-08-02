@@ -75,6 +75,6 @@ async def orm_get_meets(page: int, session: AsyncSession):
     return meets, has_next_page
 
 async def orm_delete_meet(id: int, session: AsyncSession):
-    query = delete(Meets).where(Appeals.id == id)
+    query = delete(Meets).where(Meets.id == id)
     await session.execute(query)
     await session.commit()
