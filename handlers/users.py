@@ -39,7 +39,7 @@ class MeetPaginationCallback(CallbackData, prefix="meet_page"):
     page: int
 
 
-@router.message(Command(commands=['start']), ~IsAdmin)
+@router.message(Command(commands=['start']))
 async def start_command(message: types.Message):
     await message.answer(text='Привет, выбери нужный пункт', reply_markup=main_keyboard)
 
