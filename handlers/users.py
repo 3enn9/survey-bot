@@ -49,7 +49,7 @@ async def start_command(message: types.Message, state: FSMContext):
 @router.message(F.text == 'Связаться со мной')
 async def write_me(message: types.Message, state: FSMContext):
     await state.clear()
-    await message.answer('Напишите мне @@MalyshevAntonYakovlevich')
+    await message.answer('Напишите мне @MalyshevAntonYakovlevich')
 
 
 @router.message(StateFilter(None), F.text == 'Написать обращение')

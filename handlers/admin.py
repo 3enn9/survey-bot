@@ -78,12 +78,14 @@ main_admin_keyboard = ReplyKeyboardMarkup(
 
 @router.callback_query(F.data == 'admin')
 @router.message(Command(commands=['start']))
-async def admin_command(message: types.Message):
+async def admin_command(message: types.Message, state: FSMContext):
+    await state.clear()
     await message.answer(text="Админ меню", reply_markup=main_admin_keyboard)
 
 
 @router.message(F.text == 'Список обращений')
-async def list_survey(message: types.Message, session: AsyncSession):
+async def list_survey(message: types.Message, session: AsyncSession, state: FSMContext):
+    await state.clear()
     posts, has_next_page = await orm_get_posts(0, session)
     keyboard = create_pagination_keyboard(posts, 0, has_next_page)
     await message.answer_photo(
@@ -92,7 +94,8 @@ async def list_survey(message: types.Message, session: AsyncSession):
 
 
 @router.message(F.text == 'Список мероприятий')
-async def list_meets(message: types.Message, session: AsyncSession):
+async def list_meets(message: types.Message, session: AsyncSession, state: FSMContext):
+    await state.clear()
     meets, has_next_page = await orm_get_meets(0, session)
     keyboard = create_meets_pagination_keyboard(meets, 0, has_next_page)
     await message.answer(text='Список мероприятий', reply_markup=keyboard)
