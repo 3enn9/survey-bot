@@ -41,13 +41,15 @@ class MeetPaginationCallback(CallbackData, prefix="meet_page"):
 
 
 @router.message(Command(commands=['start']))
-async def start_command(message: types.Message):
+async def start_command(message: types.Message, state: FSMContext):
+    await state.clear()
     await message.answer(text='Привет, выбери нужный пункт', reply_markup=main_keyboard)
 
 
 @router.message(F.text == 'Связаться со мной')
-async def write_me(message: types.Message):
-    await message.answer('Напишите мне @irolmad')
+async def write_me(message: types.Message, state: FSMContext):
+    await state.clear()
+    await message.answer('Напишите мне @@MalyshevAntonYakovlevich')
 
 
 @router.message(StateFilter(None), F.text == 'Написать обращение')
@@ -142,7 +144,8 @@ async def get_phone_number(message: types.Message, state: FSMContext, session: A
 
 
 @router.message(F.text == 'Мероприятия и дворовые встречи')
-async def list_meets(message: types.Message, session: AsyncSession):
+async def list_meets(message: types.Message, session: AsyncSession, state: FSMContext):
+    await state.clear()
     meets, has_next_page = await orm_get_meets(0, session)
     keyboard = create_meets_pagination_keyboard(meets, 0, has_next_page)
     await message.answer(text='Список мероприятий', reply_markup=keyboard)
