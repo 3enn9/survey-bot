@@ -219,4 +219,3 @@ async def list_meets_callback_handler(callback_query: types.CallbackQuery, sessi
 @router.message()
 async def common(message: types.Message):
     await message.answer(text=f'Я вас не понимаю\nВаш ID: {str(message.from_user.id)}')
-    await message.answer(text=message.photo[-1].file_id)
