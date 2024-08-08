@@ -10,12 +10,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import orm_delete_post, orm_add_post, orm_get_meets, orm_get_meet
 from filters import IsUser
+from config import photo_posts
 
 router = Router(name=__name__)
 router.message.filter(IsUser())
 router.callback_query.filter(IsUser())
 
-photo_posts = "AgACAgIAAxkBAAIEKGaqhpQo9sEg--nJX_d-kHA0nFcGAAKm4jEbGH5YSWQYxK_hsNyhAQADAgADeQADNQQ"
 
 class Survey(StatesGroup):
     district = State()

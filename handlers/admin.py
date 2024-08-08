@@ -11,12 +11,11 @@ from database.models import Appeals, Meets
 from filters import IsAdmin
 from database import orm_get_posts, orm_get_post, orm_delete_post, orm_add_meet, orm_get_meets, orm_get_meet, \
     orm_delete_meet
+from config import photo_posts
 
 router = Router(name=__name__)
 router.message.filter(IsAdmin())
 router.callback_query.filter(IsAdmin())
-
-photo_posts = "AgACAgIAAxkBAAIEKGaqhpQo9sEg--nJX_d-kHA0nFcGAAKm4jEbGH5YSWQYxK_hsNyhAQADAgADeQADNQQ"
 
 
 class Meet(StatesGroup):
@@ -171,7 +170,8 @@ async def delete_post(callback_query: types.CallbackQuery, session: AsyncSession
 
 @router.message(StateFilter(None), F.text == 'Добавить мероприятие')
 async def write_date(message: types.Message, state: FSMContext):
-    await message.answer(text='Напишите дату в формате ДД.ММ.ГГ, чтобы отменить действия напишите "Отменить"', reply_markup=ReplyKeyboardRemove())
+    await message.answer(text='Напишите дату в формате ДД.ММ.ГГ, чтобы отменить действия напишите "Отменить"',
+                         reply_markup=ReplyKeyboardRemove())
     await state.set_state(Meet.date)
 
 
