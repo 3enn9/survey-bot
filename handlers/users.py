@@ -15,6 +15,7 @@ router = Router(name=__name__)
 router.message.filter(IsUser())
 router.callback_query.filter(IsUser())
 
+photo_posts = "AgACAgIAAxkBAAIEKGaqhpQo9sEg--nJX_d-kHA0nFcGAAKm4jEbGH5YSWQYxK_hsNyhAQADAgADeQADNQQ"
 
 class Survey(StatesGroup):
     district = State()
@@ -110,7 +111,7 @@ async def write_an_appeal(message: types.Message, state: FSMContext):
 
 @router.message(Survey.photo, F.text)
 async def get_phone_number(message: types.Message, state: FSMContext, session: AsyncSession):
-    await state.update_data(photo='AgACAgIAAxkBAAIEKGaqhpQo9sEg--nJX_d-kHA0nFcGAAKm4jEbGH5YSWQYxK_hsNyhAQADAgADeQADNQQ')
+    await state.update_data(photo=photo_posts)
     # Создаем клавиатуру с кнопкой для запроса контакта
     contact_keyboard = ReplyKeyboardMarkup(
         resize_keyboard=True,
@@ -218,3 +219,4 @@ async def list_meets_callback_handler(callback_query: types.CallbackQuery, sessi
 @router.message()
 async def common(message: types.Message):
     await message.answer(text=f'Я вас не понимаю\nВаш ID: {str(message.from_user.id)}')
+    await message.answer(text=message.photo[-1].file_id)
